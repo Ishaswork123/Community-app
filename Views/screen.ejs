@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Community Chat App</title>
+    <link rel="stylesheet" href="/css/chat2.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="window-wrapper">
+        <div class="window-title">
+          <div class="dots">
+            <i class="fa fa-circle"></i>
+            <i class="fa fa-circle"></i>
+            <i class="fa fa-circle"></i>
+          </div>
+          <div class="title">
+            <span>Community Chat - <%= community.name %></span>
+          </div>
+        </div>
+        <div class="window-area">
+          <div class="conversation-list">
+            <ul>
+              <li class="item">
+                <a href="/dashboard">
+                  <i class="fa fa-list-alt"></i><span>Dashboard</span>
+                </a>
+              </li>
+              <div id="room-list"></div>
+            </ul>
+            <div class="my-account">
+              <div class="image">
+                <img src="/user-profile.png" alt="User Avatar" />
+                <i class="fa fa-circle online"></i>
+              </div>
+              <div class="name">
+                <span id="Uname"><%= username %></span>
+                <i class="fa fa-angle-down"></i>
+                <span class="availability">Available</span>
+              </div>
+            </div>
+          </div>
+          <div class="chat-area">
+            <div id="title" class="title">
+              <b>Conversation: <%= community.name %></b><i class="fa fa-search"></i>
+            </div>
+            <div id="chat-list" class="chat-list">
+              <ul id="output">
+                <% community.messages.forEach(message => { %>
+                  <li><b><%= message.senderId %>:</b> <%= message.content %> <small>(<%= message.timestamp.toLocaleString() %>)</small></li>
+                <% }) %>
+              </ul>
+              <div id="feedback"></div>
+            </div>
+            
+            <!-- Form to send messages -->
+            <div class="input-area">
+              <form action="/send-message" method="POST">
+                <input type="hidden" name="communityId" value="<%= community._id %>">
+                <input type="hidden" name="username" value="<%= username %>">
+                <div id="message" class="input-wrapper">
+                  <i class="fa fa-smile-o" id="emoji-btn" style="cursor: pointer"></i>
+                  <input type="text" name="message" id="message-input" placeholder="Type a message..." required />
+                </div>
+                <button type="submit" class="send-btn">Send</button>
+              </form>
+            </div>
+          </div>
+      
+          <div class="right-tabs">
+            <ul class="tabs">
+              <li class="tab-link active" data-tab="participants">
+                <a href="#"><i class="fa fa-users"></i></a>
+              </li>
+              <li class="tab-link" data-tab="room-info">
+                <a href="#"><i class="fas fa-id-card"></i></a>
+              </li>
+              <li class="tab-link" data-tab="user-info">
+                <a href="#"><i class="fa fa-link"></i></a>
+              </li>
+            </ul>
+            <div class="tabs-container">
+              <div id="participants" class="tab-content active">
+                <p><strong>Participants:</strong></p>
+                <ul>
+                  <% community.participants.forEach(participant => { %>
+                    <li><%= participant %></li>
+                  <% }) %>
+                </ul>
+              </div>
+              <div id="room-info" class="tab-content">
+                <p><strong>Room Bio:</strong> <span id="roomBio"><%= community.Bio %></span></p>
+                <p><strong>Created On:</strong> <span id="roomCreationDate"><%= community.createdAt.toLocaleDateString() %></span></p>
+                <p><strong>Created By:</strong> <span id="roomCreator"><%= community.creator %></span></p>
+              </div>
+              <div id="user-info" class="tab-content">
+                <p><strong>Username:</strong> <span id="currentUserName"><%= username %></span></p>
+                <p><strong>Joined On:</strong> <span id="joinDate"><%= community.joinDate %></span></p>
+              </div>
+            </div>
+            
+            <!-- Logout -->
+            <div class="logout">
+              <a href="/">
+                <i class="fa fa-sign-out logOut"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    <div id="emojiPicker" class="emoji-picker hidden"></div>
+    <div id="notification" class="notification hidden"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@5.0.1/dist/index.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- <script src="/js/script.js"></script>
+    <script src="/js/script2.js"></script> -->
+  </body>
+</html>

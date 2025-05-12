@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Chat Room - <%= community.communityName %></title>
+  <link rel="stylesheet" href="/css-file/chat2.css">
+  <style>
+    body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 20px;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.chat-container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 600px;
+  margin: 0 auto 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  height: 60vh;
+  overflow-y: auto;
+}
+
+.date-separator {
+  text-align: center;
+  margin: 10px 0;
+  font-weight: bold;
+  color: #555;
+}
+
+.message {
+  margin: 10px 0;
+  padding: 10px 15px;
+  border-radius: 15px;
+  max-width: 60%;
+  position: relative;
+}
+
+.sent {
+  background-color: #d1e7dd;
+  margin-left: auto;
+  text-align: right;
+}
+
+.received {
+  background-color: #c00515;
+  margin-right: auto;
+  text-align: left;
+}
+
+.message-text {
+  margin: 0;
+}
+
+.timestamp {
+  font-size: 0.8rem;
+  color: #555;
+  display: block;
+  margin-top: 5px;
+}
+
+.message-form {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.message-input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+.send-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+.send-button:hover {
+  background-color: #0056b3;
+}
+
+.back-link {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+  </style>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const socket = io();
+
+      const communityId = '<%= community._id %>';
+      socket.emit('joinCommunity', communityId);
+
+      const form = document.getElementById('chat-form');
+      const messageInput = document.getElementById('message');
+      const messageList = document.getElementById('messages');
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const message = messageInput.value;
+        if (message.trim() !== '') {
+          socket.emit('sendMessage', {
+            communityId,
+            message,
+            userId: '<%= user.id %>',
+            role: '<%= user.role %>'
+          });
+          messageInput.value = '';
+        }
+      });
+
+      socket.on('newMessage', (data) => {
+        const msgElement = document.createElement('li');
+        msgElement.textContent = `${data.senderRole} (${data.senderId}): ${data.content}`;
+        messageList.appendChild(msgElement);
+      });
+    });
+  </script>
+</head>
+<body>
+    <h2>Welcome to <%= community.communityName %> Chat Room</h2>
+    <div class="chat-container">
+        <!-- Display total registered users -->
+        <div class="total-users">
+          <h4>Total Users Registered: <%= community.totalUsers %></h4>
+        </div>
+    <div class="chat-container">
+      <% let lastDate = ''; %>
+      <% community.messages.forEach(msg => { %>
+        <% let msgDate = new Date(msg.timestamp).toLocaleDateString(); %>
+  
+        <% if (msgDate !== lastDate) { %>
+          <div class="date-separator"><%= msgDate %></div>
+          <% lastDate = msgDate; %>
+        <% } %>
+  
+        <div class="message <%= (msg?.userId && user?._id && msg.userId.toString() === user._id.toString()) ? 'sent' : 'received' %>">
+          <p class="message-text"><%= msg?.message || "Message not available" %></p>
+          <small class="timestamp"><%= msg?.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : "No Timestamp" %></small>
+      </div>
+      
+          
+      <% }); %>
+    </div>
+  
+      <input type="text" name="message" placeholder="Type your message..." required class="message-input"/>
+      <button type="submit" class="send-button">Send</button>
+    </form>
+  
+    <a href="/std/dashboard" class="back-link">Back to Dashboard</a>
+    <div class="window-wrapper">
+      <div class="window-title">
+        <div class="dots">
+          <i class="fa fa-circle"></i>
+          <i class="fa fa-circle"></i>
+          <i class="fa fa-circle"></i>
+        </div>
+        <div class="title">
+          <span>Community Chat <%= community.communityName %></span>
+        </div>
+      </div>
+      <div class="window-area">
+        <div class="left-tabs">
+          <ul class="tabs">
+            <li class="tab-link active" data-tab="general">
+              <a href="#"><i class="fa fa-home"></i></a>
+            </li>
+            <li class="tab-link" data-tab="files">
+              <a href="#"><i class="fa fa-file"></i></a>
+            </li>
+            <li class="tab-link" data-tab="settings">
+              <a href="#"><i class="fa fa-cog"></i></a>
+            </li>
+          </ul>
+      
+          <div class="tabs-container">
+            <!-- General Info Section -->
+            <div id="general" class="tab-content active">
+              <h3>General Info</h3>
+              <p>Welcome to <strong><%= community.communityName %></strong>!</p>
+            </div>
+      
+            <!-- Files Section -->
+            <div id="files" class="tab-content">
+              <h3>Shared Files</h3>
+             
+            </div>
+      
+            <!-- Settings Section -->
+            <div id="settings" class="tab-content">
+              <h3>Chat Settings</h3>
+              <button>Change Theme</button>
+              <button>Notification Settings</button>
+            </div>
+          </div>
+        </div>
+      
+        <div class="conversation-list">
+          <ul>
+            <li class="item">
+              <a href="#"
+                ><i class="fa fa-list-alt"></i><span>Dashboard</span></a
+              >
+            </li>
+            <div id="room-list"></div>
+          </ul>
+          <div class="my-account">
+            <div class="image">
+              <img src="/user-profile.png" alt="User Avatar" />
+              <i class="fa fa-circle online"></i>
+            </div>
+            <div class="name">
+              <span id="Uname"></span>
+              <i class="fa fa-angle-down"></i>
+              <span class="availability">Available</span>
+            </div>
+          </div>
+        </div>
+        <div class="chat-area">
+          <div id="title" class="title">
+            <b>Conversation title</b><i class="fa fa-search"></i>
+          </div>
+          <div id="chat-list" class="chat-list">
+            <ul id="output"></ul>
+            <div id="feedback"></div>
+          </div>
+          <div class="input-area">
+            <div id="message" class="input-wrapper">
+              <i
+                class="fa fa-smile-o"
+                id="emoji-btn"
+                style="cursor: pointer"
+              ></i>
+              <form action="/std/chat/<%= community._id %>/message" method="POST" class="message-form">
+
+              <input
+                type="text"
+                id="message-input"
+                name="message" placeholder="Type your message..." required class="message-input"
+                
+              />
+            </div>
+            <input type="button" id="send" value="Send" class="send-btn" /></form>>
+          </div>
+        </div>
+        <div class="right-tabs">
+          <ul class="tabs">
+              <li class="tab-link active" data-tab="participants">
+                  <a href="#"><i class="fa fa-users"></i></a>
+              </li>
+              <li class="tab-link" data-tab="room-info">
+                  <a href="#"><i class="fas fa-id-card"></i></a>
+              </li>
+              <li class="tab-link" data-tab="user-info">
+                  <a href="#"><i class="fa fa-link"></i></a>
+              </li>
+          </ul>
+      
+          <div class="tabs-container">
+              <!-- Participants Section -->
+              <div id="participants" class="tab-content active">
+                  <h3>Participants</h3>
+                  <ul>
+                      <% community.users.forEach(user => { %>
+                          <li><%= user %></li> <!-- If user is an ID, fetch user details separately -->
+                      <% }); %>
+                  </ul>
+                  <p><strong>Total Users:</strong> <%= community.totalUsers %></p>
+              </div>
+      
+              <!-- Room Info Section -->
+              <div id="room-info" class="tab-content">
+                  <p><strong>Room Name:</strong> <%= community.communityName %></p>
+                  <p><strong>Room Bio:</strong> <%= community.commDescription %></p>
+                  <p>
+                      <strong>Created On:</strong>
+                      <span id="roomCreationDate"><%= new Date(community.createdAt).toLocaleString() %></span>
+                  </p>
+                  <p><strong>Created By:</strong> <%= community.users[0] %></p> <!-- Assuming first user is creator -->
+              </div>
+      
+              <!-- User Info Section -->
+              <!-- User Info Section -->
+<div id="user-info" class="tab-content">
+  <p><strong>Username:</strong> <%= user.username %></p>
+  <p><strong>Joined On:</strong> <%= new Date(user.createdAt).toLocaleString() %></p>
+</div>
+
+          </div>
+      </div>
+      
+          <!-- logout -->
+          <div class="logout">
+            <a href="/">
+              <i class="fa fa-sign-out logOut"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

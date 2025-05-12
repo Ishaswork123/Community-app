@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Community App</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+      
+  </head>
+
+  <body>
+    <div class="container">
+        <!-- Pre-Join Screen -->
+         <form action="">
+        <div id="preJoinScreen" class="prejoin-screen">
+          <h2>Welcome!</h2>
+          <div id="joinedRoomsContainer">
+            <h3>Joined:</h3>
+            <% communities.forEach(community => { %>
+                <li>
+                  <form action="/std/join-community" method="POST">
+                    <input type="hidden" name="communityId" value="<%= community._id %>" />
+                    <input type="hidden" name="username" value="<%= username %>" />
+                    <button type="submit">Join <%= community.communityName %></button>
+                  </form>
+                </li>
+              <% }) %>
+          </div>
+          <!-- <div id="otherRoomsContainer">
+            <h3>Others:</h3>
+            <ul id="otherRoomsList"></ul>
+          </div>
+          <div class="form-container">
+            <h3>Join a Room</h3>
+            <input type="text" id="joinUserName" placeholder="Your Name" />
+            <input type="text" id="joinRoomName" placeholder="Room Name" /> -->
+            <button id="joinRoomBtn">Join Room</button>
+             <a href="/std/dashboard">
+     <h3> Create New Room</h3></a>
+        </form> <br />
+      
+            <!-- Create Room Modal Trigger -->
+          </div>
+        </div>
+      </div>
+      
+      <!-- Modal -->
+   
+          <!-- <form action="/std/dashboard" method="post">
+
+          <input type="text" id="createUserName" placeholder="Your Name" name="createUserName" />
+          <input type="text" id="createRoomName" placeholder="Room Name" name=" communityName" />
+          <textarea id="createRoomBio" placeholder="Room Bio" name="Bio"></textarea>
+          <button id="createRoomBtn">Create Room</button>
+        </form>  </div>
+      </div> -->
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- <script src="/js/script.js"></script>
+    <script src="/js/script2.js"></script> -->
+    <script>
+          const openModal = document.getElementById("openCreateModal");
+  const modal = document.getElementById("createRoomModal");
+  const closeModal = document.querySelector(".close");
+
+  openModal.addEventListener("click", () => {
+    modal.style.display = "flex";
+  });
+
+  closeModal.addEventListener("click", () => {
+    modal.style.display = "none";
+  });
+
+  window.addEventListener("click", (event) => {
+    if (event.target === modal) {
+      modal.style.display = "none";
+    }
+  });
+    </script>
+  </body>
+</html>
